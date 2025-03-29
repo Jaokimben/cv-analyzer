@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CV Analyzer - Téléchargement</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>CV Analyzer</h1>
+            <p class="tagline">Votre CV adapté est prêt !</p>
+        </div>
+    </header>
+
+    <main class="container">
+        <section class="success-message">
+            <div class="success-icon">✓</div>
+            <h2>Félicitations !</h2>
+            <p>Votre CV a été adapté avec succès en fonction de la description du poste.</p>
+        </section>
+
+        <section class="download-section">
+            <p>Votre CV adapté est maintenant prêt à être téléchargé. Les mots-clés pertinents ont été mis en évidence pour maximiser l'impact de votre candidature.</p>
+            
+            <div class="download-actions">
+                <a href="{{ url_for('get_file', filename=filename) }}" class="btn primary download-btn">
+                    Télécharger mon CV adapté
+                </a>
+            </div>
+            
+            {% if session and session.stats %}
+            <div class="analysis-results">
+                <h3>Résultats de l'analyse</h3>
+                <div class="stats-container">
+                    <div class="stat-card">
+                        <div class="stat-value">{{ session.stats.highlighted_keywords }}</div>
+                        <div class="stat-label">Mots-clés mis en évidence</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">{{ session.stats.paragraphs_modified }}</div>
+                        <div class="stat-label">Paragraphes modifiés</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">{{ session.stats.total_keywords }}</div>
+                        <div class="stat-label">Mots-clés identifiés</div>
+                    </div>
+                </div>
+                
+                {% if session.keywords %}
+                <div class="keywords-section">
+                    <h4>Mots-clés identifiés par catégorie</h4>
+                    <div class="keywords-container">
+                        {% for category, words in session.keywords.items() %}
+                        {% if words %}
+                        <div class="keyword-category">
+                            <h5>{{ category|capitalize }}</h5>
+                            <div class="keyword-tags">
+                                {% for word, count in words.items() %}
+                                <span class="keyword-tag">{{ word }}</span>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+            {% endif %}
+            
+            <div class="next-steps">
+                <h3>Prochaines étapes</h3>
+                <ul>
+                    <li>Vérifiez que les mots-clés mis en évidence sont pertinents</li>
+                    <li>Personnalisez votre lettre de motivation en utilisant les mêmes mots-clés</li>
+                    <li>Envoyez votre candidature avec votre CV adapté</li>
+                </ul>
+            </div>
+        </section>
+
+        <section class="return-home">
+            <a href="{{ url_for('index') }}" class="btn secondary">Adapter un autre CV</a>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 CV Analyzer - Tous droits réservés</p>
+        </div>
+    </footer>
+</body>
+</html>

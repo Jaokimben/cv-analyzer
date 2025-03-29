@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Erreur serveur - CV Analyzer</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>CV Analyzer</h1>
+        </div>
+    </header>
+
+    <main class="container error-page">
+        <div class="error-code">500</div>
+        <h2>Erreur serveur</h2>
+        <p>Une erreur inattendue s'est produite. Veuillez réessayer ultérieurement.</p>
+        <a href="{{ url_for('index') }}" class="btn primary">Retour à l'accueil</a>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 CV Analyzer - Tous droits réservés</p>
+        </div>
+    </footer>
+</body>
+</html>

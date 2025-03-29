@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CV Analyzer - Adaptez votre CV aux offres d'emploi</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>CV Analyzer</h1>
+            <p class="tagline">Adaptez votre CV pour maximiser vos chances</p>
+        </div>
+    </header>
+
+    <main class="container">
+        <section class="intro">
+            <h2>Optimisez votre candidature en quelques clics</h2>
+            <p>Notre outil analyse votre CV et la description du poste pour mettre en évidence les compétences et expériences pertinentes.</p>
+            <div class="features">
+                <div class="feature">
+                    <div class="feature-icon">🔍</div>
+                    <h3>Analyse intelligente</h3>
+                    <p>Identification automatique des mots-clés importants dans l'offre d'emploi</p>
+                </div>
+                <div class="feature">
+                    <div class="feature-icon">✨</div>
+                    <h3>Mise en valeur</h3>
+                    <p>Mise en évidence des compétences pertinentes dans votre CV</p>
+                </div>
+                <div class="feature">
+                    <div class="feature-icon">📊</div>
+                    <h3>Statistiques détaillées</h3>
+                    <p>Visualisation des correspondances entre votre profil et l'offre</p>
+                </div>
+            </div>
+        </section>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="messages">
+                    {% for category, message in messages %}
+                        <div class="message {{ category }}">{{ message }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        <section class="upload-form">
+            <form action="{{ url_for('upload_file') }}" method="post" enctype="multipart/form-data">
+                <div class="form-group">
+                    <label for="cv_file">Téléchargez votre CV (format .docx)</label>
+                    <div class="file-input-container">
+                        <input type="file" id="cv_file" name="cv_file" accept=".docx" required>
+                        <div class="file-input-button">Choisir un fichier</div>
+                        <div class="file-input-name">Aucun fichier sélectionné</div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="job_description">Description du poste</label>
+                    <textarea id="job_description" name="job_description" rows="10" placeholder="Copiez-collez ici la description complète du poste..." required></textarea>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn primary">Adapter mon CV</button>
+                </div>
+            </form>
+        </section>
+
+        <section class="how-it-works">
+            <h2>Comment ça marche ?</h2>
+            <div class="steps">
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <h3>Téléchargez votre CV</h3>
+                    <p>Importez votre CV au format Word (.docx)</p>
+                </div>
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <h3>Ajoutez la description du poste</h3>
+                    <p>Copiez-collez le texte complet de l'annonce</p>
+                </div>
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <h3>Obtenez votre CV adapté</h3>
+                    <p>Téléchargez votre CV optimisé pour cette offre</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="benefits">
+            <h2>Pourquoi adapter votre CV ?</h2>
+            <ul>
+                <li>Augmentez vos chances de passer les filtres ATS</li>
+                <li>Mettez en valeur les compétences recherchées par le recruteur</li>
+                <li>Personnalisez votre candidature pour chaque offre</li>
+                <li>Gagnez du temps dans la préparation de vos candidatures</li>
+            </ul>
+        </section>
+        
+        <section class="testimonials">
+            <h2>Ce que disent nos utilisateurs</h2>
+            <div class="testimonial-container">
+                <div class="testimonial">
+                    <div class="testimonial-content">
+                        <p>"Grâce à CV Analyzer, j'ai pu adapter mon CV rapidement et j'ai décroché un entretien dès ma première candidature !"</p>
+                    </div>
+                    <div class="testimonial-author">Sophie D., Développeuse Web</div>
+                </div>
+                <div class="testimonial">
+                    <div class="testimonial-content">
+                        <p>"Un outil simple et efficace qui m'a permis de mettre en valeur mes compétences les plus pertinentes pour chaque poste."</p>
+                    </div>
+                    <div class="testimonial-author">Thomas M., Chef de Projet</div>
+                </div>
+                <div class="testimonial">
+                    <div class="testimonial-content">
+                        <p>"Je recommande vivement cet outil à tous les chercheurs d'emploi. Il fait vraiment la différence !"</p>
+                    </div>
+                    <div class="testimonial-author">Julie L., Directrice Marketing</div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>CV Analyzer</h3>
+                    <p>Optimisez vos candidatures avec notre outil d'adaptation de CV intelligent.</p>
+                </div>
+                <div class="footer-section">
+                    <h3>Liens utiles</h3>
+                    <ul>
+                        <li><a href="{{ url_for('index') }}">Accueil</a></li>
+                        <li><a href="{{ url_for('stats') }}">Statistiques</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 CV Analyzer - Tous droits réservés</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Script pour afficher le nom du fichier sélectionné
+        document.getElementById('cv_file').addEventListener('change', function(e) {
+            var fileName = e.target.files[0] ? e.target.files[0].name : 'Aucun fichier sélectionné';
+            document.querySelector('.file-input-name').textContent = fileName;
+        });
+    </script>
+</body>
+</html>
