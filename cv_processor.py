@@ -4,6 +4,8 @@ import uuid
 import logging
 from collections import Counter
 from docx import Document
+import PyPDF2
+from io import BytesIO
 
 class CVProcessor:
     """
@@ -154,61 +156,108 @@ class CVProcessor:
         # Éliminer les doublons
         all_keywords = list(set(all_keywords))
         
+        # Détecter le type de fichier
+        file_ext = os.path.splitext(cv_path)[1].lower()
+        
         try:
-            # Charger le document Word original pour le modifier
-            doc = Document(cv_path)
-            
-            # Statistiques
-            stats = {
-                "total_keywords": len(all_keywords),
-                "highlighted_keywords": 0,
-                "paragraphs_modified": 0
-            }
-            
-            # Adapter le CV en mettant en évidence les compétences pertinentes
-            for paragraph in doc.paragraphs:
-                paragraph_modified = False
+            # Détecter et traiter selon le type de fichier
+            if file_ext == '.docx':
+                # Traitement des fichiers Word
+                doc = Document(cv_path)
                 
-                for keyword in all_keywords:
-                    if keyword in paragraph.text.lower():
-                        # Mettre en gras les mots-clés trouvés
-                        pattern = re.compile(re.escape(keyword), re.IGNORECASE)
-                        
-                        # Sauvegarde du texte original
-                        original_text = paragraph.text
-                        
-                        # Effacer le contenu du paragraphe
-                        paragraph.clear()
-                        
-                        # Trouver toutes les occurrences du mot-clé
-                        matches = list(pattern.finditer(original_text))
-                        
-                        # Si aucune correspondance, continuer
-                        if not matches:
-                            paragraph.add_run(original_text)
-                            continue
-                        
-                        # Ajouter le texte avec les mots-clés en gras
-                        last_end = 0
-                        for match in matches:
-                            # Ajouter le texte avant le mot-clé
-                            if match.start() > last_end:
-                                paragraph.add_run(original_text[last_end:match.start()])
-                            
-                            # Ajouter le mot-clé souligné
-                            paragraph.add_run(original_text[match.start():match.end()]).underline = True
-                            stats["highlighted_keywords"] += 1
-                            
-                            last_end = match.end()
-                        
-                        # Ajouter le reste du texte
-                        if last_end < len(original_text):
-                            paragraph.add_run(original_text[last_end:])
-                        
-                        paragraph_modified = True
+                # Statistiques
+                stats = {
+                    "total_keywords": len(all_keywords),
+                    "highlighted_keywords": 0,
+                    "paragraphs_modified": 0
+                }
                 
-                if paragraph_modified:
-                    stats["paragraphs_modified"] += 1
+                # Adapter le CV en mettant en évidence les compétences pertinentes
+                for paragraph in doc.paragraphs:
+                    paragraph_modified = False
+                    
+                    for keyword in all_keywords:
+                        if keyword in paragraph.text.lower():
+                            # Mettre en gras les mots-clés trouvés
+                            pattern = re.compile(re.escape(keyword), re.IGNORECASE)
+                            
+                            # Sauvegarde du texte original
+                            original_text = paragraph.text
+                            
+                            # Effacer le contenu du paragraphe
+                            paragraph.clear()
+                            
+                            # Trouver toutes les occurrences du mot-clé
+                            matches = list(pattern.finditer(original_text))
+                            
+                            # Si aucune correspondance, continuer
+                            if not matches:
+                                paragraph.add_run(original_text)
+                                continue
+                            
+                            # Ajouter le texte avec les mots-clés en gras
+                            last_end = 0
+                            for match in matches:
+                                # Ajouter le texte avant le mot-clé
+                                if match.start() > last_end:
+                                    paragraph.add_run(original_text[last_end:match.start()])
+                                
+                                # Ajouter le mot-clé souligné
+                                paragraph.add_run(original_text[match.start():match.end()]).underline = True
+                                stats["highlighted_keywords"] += 1
+                                
+                                last_end = match.end()
+                            
+                            # Ajouter le reste du texte
+                            if last_end < len(original_text):
+                                paragraph.add_run(original_text[last_end:])
+                            
+                            paragraph_modified = True
+                    
+                    if paragraph_modified:
+                        stats["paragraphs_modified"] += 1
+                
+                # Générer un nom de fichier unique pour le CV adapté
+                output_filename = f"cv_adapte_{uuid.uuid4().hex}.docx"
+                output_path = os.path.join(self.download_folder, output_filename)
+                
+                # Sauvegarder le document Word modifié
+                doc.save(output_path)
+                
+            elif file_ext == '.pdf':
+                # Traitement des fichiers PDF
+                with open(cv_path, 'rb') as pdf_file:
+                    pdf_reader = PyPDF2.PdfReader(pdf_file)
+                    pdf_writer = PyPDF2.PdfWriter()
+                    
+                    # Statistiques
+                    stats = {
+                        "total_keywords": len(all_keywords),
+                        "highlighted_keywords": 0,
+                        "pages_modified": 0
+                    }
+                    
+                    # Traiter chaque page du PDF
+                    for page_num in range(len(pdf_reader.pages)):
+                        page = pdf_reader.pages[page_num]
+                        text = page.extract_text()
+                        
+                        if text:
+                            # Vérifier les mots-clés dans le texte
+                            for keyword in all_keywords:
+                                if keyword in text.lower():
+                                    stats["highlighted_keywords"] += text.lower().count(keyword)
+                            
+                            if stats["highlighted_keywords"] > 0:
+                                stats["pages_modified"] += 1
+                    
+                    # Pour l'instant, on sauvegarde le PDF original sans modification
+                    # (Dans une version future, on pourrait ajouter des annotations)
+                    output_filename = f"cv_adapte_{uuid.uuid4().hex}.pdf"
+                    output_path = os.path.join(self.download_folder, output_filename)
+                    
+                    with open(output_path, 'wb') as output_file:
+                        pdf_writer.write(output_file)
             
             # Générer un nom de fichier unique pour le CV adapté
             output_filename = f"cv_adapte_{uuid.uuid4().hex}.docx"
