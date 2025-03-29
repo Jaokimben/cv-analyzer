@@ -32,7 +32,7 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['DOWNLOAD_FOLDER'] = DOWNLOAD_FOLDER
 
 # Extensions autorisées
-ALLOWED_EXTENSIONS = {'docx'}
+ALLOWED_EXTENSIONS = {'docx', 'pdf'}
 
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
@@ -95,7 +95,7 @@ def upload_file():
     # Vérifier si le fichier est autorisé
     if not allowed_file(file.filename):
         logger.warning(f"Format de fichier non autorisé: {file.filename}")
-        flash('Format de fichier non autorisé. Veuillez télécharger un fichier .docx', 'error')
+        flash('Format de fichier non autorisé. Veuillez télécharger un fichier .docx ou .pdf', 'error')
         return redirect(request.url)
     
     # Récupérer la description du poste

@@ -51,9 +51,9 @@
         <section class="upload-form">
             <form action="{{ url_for('upload_file') }}" method="post" enctype="multipart/form-data">
                 <div class="form-group">
-                    <label for="cv_file">Téléchargez votre CV (format .docx)</label>
+                    <label for="cv_file">Téléchargez votre CV (formats .docx ou .pdf)</label>
                     <div class="file-input-container">
-                        <input type="file" id="cv_file" name="cv_file" accept=".docx" required>
+                        <input type="file" id="cv_file" name="cv_file" accept=".docx,.pdf" required>
                         <div class="file-input-button">Choisir un fichier</div>
                         <div class="file-input-name">Aucun fichier sélectionné</div>
                     </div>
@@ -76,7 +76,7 @@
                 <div class="step">
                     <div class="step-number">1</div>
                     <h3>Téléchargez votre CV</h3>
-                    <p>Importez votre CV au format Word (.docx)</p>
+                    <p>Importez votre CV au format Word (.docx) ou PDF (.pdf)</p>
                 </div>
                 <div class="step">
                     <div class="step-number">2</div>
