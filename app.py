@@ -78,11 +78,17 @@ def index():
 def upload_file():
     logger.info("Début du traitement d'une demande d'adaptation de CV")
     
+    # Vérifier que la méthode est POST
+    if request.method != 'POST':
+        logger.warning(f"Méthode non autorisée: {request.method}")
+        flash('Méthode non autorisée. Veuillez utiliser POST pour envoyer des fichiers', 'error')
+        return jsonify({"error": "Method not allowed", "allowed_methods": ["POST"]}), 405
+    
     # Vérifier si la requête contient un fichier
     if 'cv_file' not in request.files:
         logger.warning("Aucun fichier sélectionné dans la requête")
         flash('Aucun fichier sélectionné', 'error')
-        return redirect(request.url)
+        return jsonify({"error": "No file provided"}), 400
     
     file = request.files['cv_file']
     
