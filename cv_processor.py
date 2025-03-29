@@ -195,8 +195,8 @@ class CVProcessor:
                             if match.start() > last_end:
                                 paragraph.add_run(original_text[last_end:match.start()])
                             
-                            # Ajouter le mot-clé en gras
-                            paragraph.add_run(original_text[match.start():match.end()]).bold = True
+                            # Ajouter le mot-clé souligné
+                            paragraph.add_run(original_text[match.start():match.end()]).underline = True
                             stats["highlighted_keywords"] += 1
                             
                             last_end = match.end()
