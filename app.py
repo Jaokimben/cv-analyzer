@@ -15,16 +15,6 @@ logging.basicConfig(
 )
 logger = logging.getLogger('cv_analyzer_app')
 
-# Configuration de l'application
-app = Flask(__name__)
-app.secret_key = os.environ.get('SECRET_KEY', 'votre_cle_secrete_ici')
-app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16 MB max
-app.config['SESSION_TYPE'] = 'filesystem'
-app.config['PERMANENT_SESSION_LIFETIME'] = 1800  # 30 minutes
-app.config['SESSION_FILE_DIR'] = str(storage_manager.get_upload_path())
-app.config['SESSION_FILE_THRESHOLD'] = 100
-app.config['SESSION_FILE_MODE'] = 0o600
-
 # Initialisation du gestionnaire de stockage
 storage_manager = StorageManager()
 logger.info(f"Gestionnaire de stockage initialisé. Environnement Render: {storage_manager.is_render_environment()}")
@@ -33,6 +23,15 @@ logger.info(f"Gestionnaire de stockage initialisé. Environnement Render: {stora
 UPLOAD_FOLDER = str(storage_manager.get_upload_path())
 DOWNLOAD_FOLDER = str(storage_manager.get_download_path())
 
+# Configuration de l'application
+app = Flask(__name__)
+app.secret_key = os.environ.get('SECRET_KEY', 'votre_cle_secrete_ici')
+app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16 MB max
+app.config['SESSION_TYPE'] = 'filesystem'
+app.config['PERMANENT_SESSION_LIFETIME'] = 1800  # 30 minutes
+app.config['SESSION_FILE_DIR'] = UPLOAD_FOLDER
+app.config['SESSION_FILE_THRESHOLD'] = 100
+app.config['SESSION_FILE_MODE'] = 0o600
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['DOWNLOAD_FOLDER'] = DOWNLOAD_FOLDER
 
