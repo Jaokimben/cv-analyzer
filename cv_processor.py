@@ -6,6 +6,8 @@ from collections import Counter
 from docx import Document
 import PyPDF2
 from io import BytesIO
+from reportlab.pdfgen import canvas
+from reportlab.lib.colors import yellow
 
 class CVProcessor:
     """
@@ -126,6 +128,47 @@ class CVProcessor:
                 return match.group(1).strip()
         return ""
     
+    def _annotate_pdf_page(self, page, text, keywords):
+        """
+        Ajoute des annotations sur une page PDF pour mettre en évidence les mots-clés.
+        
+        Args:
+            page: Page PDF à annoter
+            text (str): Texte extrait de la page
+            keywords (list): Liste des mots-clés à mettre en évidence
+        """
+        # Créer un canvas pour les annotations
+        packet = BytesIO()
+        can = canvas.Canvas(packet, pagesize=page.mediabox)
+        
+        # Trouver les positions des mots-clés dans le texte
+        for keyword in keywords:
+            start = 0
+            while True:
+                pos = text.lower().find(keyword.lower(), start)
+                if pos == -1:
+                    break
+                    
+                # Calculer la position approximative sur la page
+                # Note: Cette méthode est simplifiée et pourrait être améliorée
+                x = pos * 7  # Approximation grossière
+                y = page.mediabox.height - (pos // 50 * 12)  # Approximation grossière
+                
+                # Ajouter une annotation en surbrillance
+                can.setFillColor(yellow, alpha=0.3)
+                can.rect(x, y, len(keyword) * 7, 12, fill=True)
+                
+                start = pos + 1
+        
+        can.save()
+        packet.seek(0)
+        
+        # Créer une nouvelle page avec les annotations
+        new_pdf = PyPDF2.PdfReader(packet)
+        page.merge_page(new_pdf.pages[0])
+        
+        return page
+
     def adapt_cv(self, cv_path, job_description):
         """
         Adapte un CV en fonction d'une description de poste avec mise en évidence avancée.
@@ -217,13 +260,6 @@ class CVProcessor:
                     if paragraph_modified:
                         stats["paragraphs_modified"] += 1
                 
-                # Générer un nom de fichier unique pour le CV adapté
-                output_filename = f"cv_adapte_{uuid.uuid4().hex}.docx"
-                output_path = os.path.join(self.download_folder, output_filename)
-                
-                # Sauvegarder le document Word modifié
-                doc.save(output_path)
-                
             elif file_ext == '.pdf':
                 # Traitement des fichiers PDF
                 with open(cv_path, 'rb') as pdf_file:
@@ -249,25 +285,27 @@ class CVProcessor:
                                     stats["highlighted_keywords"] += text.lower().count(keyword)
                             
                             if stats["highlighted_keywords"] > 0:
+                                # Annoter la page avec les mots-clés trouvés
+                                page = self._annotate_pdf_page(page, text, all_keywords)
                                 stats["pages_modified"] += 1
-                    
-                    # Pour l'instant, on sauvegarde le PDF original sans modification
-                    # (Dans une version future, on pourrait ajouter des annotations)
-                    output_filename = f"cv_adapte_{uuid.uuid4().hex}.pdf"
-                    output_path = os.path.join(self.download_folder, output_filename)
-                    
-                    with open(output_path, 'wb') as output_file:
-                        pdf_writer.write(output_file)
+                            
+                            # Ajouter la page au writer
+                            pdf_writer.add_page(page)
             
             # Générer un nom de fichier unique pour le CV adapté
-            output_filename = f"cv_adapte_{uuid.uuid4().hex}.docx"
+            output_filename = f"cv_adapte_{uuid.uuid4().hex}{file_ext}"
             output_path = os.path.join(self.download_folder, output_filename)
             
             # Assurer que le dossier de destination existe
             os.makedirs(os.path.dirname(output_path), exist_ok=True)
             
-            # Sauvegarder le document modifié
-            doc.save(output_path)
+            # Sauvegarder le document modifié selon le type de fichier
+            if file_ext == '.docx':
+                doc.save(output_path)
+            elif file_ext == '.pdf':
+                # Pour les PDF, on sauvegarde le fichier modifié
+                with open(output_path, 'wb') as output_file:
+                    pdf_writer.write(output_file)
             
             # Vérifier que le fichier a bien été créé
             if not os.path.exists(output_path):
