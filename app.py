@@ -1,6 +1,5 @@
 import os
 import uuid
-import docx2txt
 import logging
 from docx import Document
 from flask import Flask, render_template, request, redirect, url_for, flash, send_from_directory, jsonify, session
