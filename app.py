@@ -132,10 +132,8 @@ def upload_file():
         
         # Stocker les statistiques dans la session pour affichage
         if isinstance(result, dict) and 'stats' in result:
-            session = {
-                'stats': result['stats'],
-                'keywords': result.get('keywords', {})
-            }
+            session['stats'] = result['stats']
+            session['keywords'] = result.get('keywords', {})
         
         # Rediriger vers la page de téléchargement
         logger.info(f"CV adapté avec succès: {result['filename']}")
